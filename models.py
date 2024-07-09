@@ -18,6 +18,7 @@ quirks of the data set, such as missing names and unknown diameters.
 You'll edit this file in Task 1.
 """
 from helpers import cd_to_datetime, datetime_to_str
+from math import isnan
 
 
 class NearEarthObject:
@@ -44,10 +45,20 @@ class NearEarthObject:
         # You should coerce these values to their appropriate data type and
         # handle any edge cases, such as a empty name being represented by `None`
         # and a missing diameter being represented by `float('nan')`.
-        self.designation = ''
-        self.name = None
-        self.diameter = float('nan')
-        self.hazardous = False
+
+        # Required
+        self.designation = str(info['designation'])
+        self.hazardous = bool(info['hazardous'])
+
+        # Optional; could be missing or empty string
+        raw_name = info.get('name')
+        self.name = str(raw_name) if raw_name else None
+        raw_diameter = info.get('diameter')
+        # Set diameter to nan only if missing or empty string; leave 0 as is
+        if raw_diameter == '' or raw_diameter is None:
+            self.diameter = float('nan')
+        else:
+            self.diameter = float(raw_diameter)
 
         # Create an empty initial collection of linked approaches.
         self.approaches = []
@@ -56,14 +67,20 @@ class NearEarthObject:
     def fullname(self):
         """Return a representation of the full name of this NEO."""
         # TODO: Use self.designation and self.name to build a fullname for this object.
-        return ''
+        return f'{self.designation} ({self.name})' if self.name else f'{self.designation}'
 
     def __str__(self):
         """Return `str(self)`."""
         # TODO: Use this object's attributes to return a human-readable string representation.
         # The project instructions include one possibility. Peek at the __repr__
         # method for examples of advanced string formatting.
-        return f"A NearEarthObject ..."
+        if isnan(self.diameter):
+            diameter_string = f'an unknown diameter'
+        else:
+            diameter_string = f'a diameter of {self.diameter:.3f} km'
+        hazardous_string = 'is' if self.hazardous else 'is not'
+        hazardous_string += ' potentially hazardous'
+        return f"NEO {self.fullname} has {diameter_string} and {hazardous_string}."
 
     def __repr__(self):
         """Return `repr(self)`, a computer-readable string representation of this object."""
@@ -95,10 +112,10 @@ class CloseApproach:
         # onto attributes named `_designation`, `time`, `distance`, and `velocity`.
         # You should coerce these values to their appropriate data type and handle any edge cases.
         # The `cd_to_datetime` function will be useful.
-        self._designation = ''
-        self.time = None  # TODO: Use the cd_to_datetime function for this attribute.
-        self.distance = 0.0
-        self.velocity = 0.0
+        self._designation = str(info['designation'])
+        self.time = cd_to_datetime(info['time'])  # TODO: Use the cd_to_datetime function for this attribute.
+        self.distance = float(info['distance'])
+        self.velocity = float(info['velocity'])
 
         # Create an attribute for the referenced NEO, originally None.
         self.neo = None
@@ -119,14 +136,17 @@ class CloseApproach:
         # TODO: Use this object's `.time` attribute and the `datetime_to_str` function to
         # build a formatted representation of the approach time.
         # TODO: Use self.designation and self.name to build a fullname for this object.
-        return ''
+        return datetime_to_str(self.time)
 
     def __str__(self):
         """Return `str(self)`."""
         # TODO: Use this object's attributes to return a human-readable string representation.
         # The project instructions include one possibility. Peek at the __repr__
         # method for examples of advanced string formatting.
-        return f"A CloseApproach ..."
+        neo_string = self.neo.fullname if self.neo else f'the object {self._designation}'
+        return f'At {self.time_str}, {neo_string} approaches Earth ' \
+                f'at a distance of {self.distance:.2f} au ' \
+                f'with a velocity of {self.velocity:.2f} km/s.'
 
     def __repr__(self):
         """Return `repr(self)`, a computer-readable string representation of this object."""
