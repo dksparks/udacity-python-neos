@@ -1,3 +1,11 @@
+# Project for Udacity Advanced Python Techniques Course
+
+This is my submission for the Exploring Near-Earth Objects project, which is the final part of the Udacity course on Advanced Python Techniques.
+
+The original README.md that was provided with the project scaffolding is preserved below.
+
+---
+
 # Explore Close Approaches of Near-Earth Objects
 
 In this project, you'll use Python - and the skills we've developed throughout this course - to search for and explore close approaches of near-Earth objects (NEOs), using data from NASA/JPL's Center for Near Earth Object Studies.
