@@ -31,8 +31,26 @@ def write_to_csv(results, filename):
         writer = csv.DictWriter(csv_file, fieldnames)
         writer.writeheader()
         for ca in results:
-            writer.writerow(ca.serialize() | ca.neo.serialize())
 
+            # Note: The reviewer of my first submission suggested that
+            # there was a problem with the .serialize() methods, but in
+            # fact the issue seems merely to be the fact that I used the
+            # dictionary union operator '|' in the line below.
+            # This operator only became available in Python 3.9, which
+            # is why it works fine on my machine (running Python 3.12.3)
+            # but results in a TypeError for the reviewer.
+            #
+            # writer.writerow(ca.serialize() | ca.neo.serialize())
+            #
+            # The revised code, which should run properly on the
+            # reviewer's older version of Python, is below.
+
+            approach_dict = ca.serialize()
+            neo_dict = ca.neo.serialize()
+            for key, value in neo_dict.items():
+                approach_dict[key] = value
+            writer.writerow(approach_dict)
+            
 
 def write_to_json(results, filename):
     """Write an iterable of `CloseApproach` objects to a JSON file.
